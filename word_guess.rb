@@ -11,37 +11,22 @@ class UserGuess
       @guess = gets.chomp.downcase
     end
   end
-
-  # def compare_to_answer(answer_word)
-  #   @correct_guess = []
-  #   @wrong_guess = []
-  #   if answer_word.word.include?(@guess)
-  #     @correct_guess << @guess
-  #   else
-  #     @wrong_guess << @guess
-  #   end
-  # end
-
 end
 
 class Answer
   attr_reader :word, :letters, :length, :correct_array, :wrong_guess, :lives_counter, :blank_array
   def initialize
-    # words = ["testing"]
-    # @word = words.sample
     @word = RandomWord.adjs.next
     @letters = @word.split(//).uniq
     @length = @word.length
     @correct_array = @word.split(//)
-    @blank_array = Array.new(@length, "__")
-    # @correct_guess = []
+    @blank_array = Array.new(@length, "_")
     @wrong_guess = []
     @lives_counter = @length
   end
 
   def compare_to_answer(guess)
     if @letters.include?(guess.guess)
-      # @correct_guess << guess.guess
       update_blank_array(guess)
     else
       @wrong_guess << guess.guess
@@ -64,14 +49,8 @@ end
 class GameBoard
   attr_reader :lives_counter
   def initialize
-    # @main_image = display_main_image
-    # @lives_counter = 4
     @flower_counter =" @ "
   end
-
-  # def losing_lives(answer)
-  #   @lives_counter  (answer.wrong_guess).length
-  # end
 
   def lives_counter_display(answer)
     answer.lives_counter.times do
@@ -89,28 +68,28 @@ class GameBoard
 
   def display_ground(answer)
     answer.length.times do
-      print "==="
+      print "\#\#\#"
     end
     puts ""
   end
 
   def display_gameboard(answer)
+    puts ""
     lives_counter_display(answer)
     display_stems(answer)
     display_stems(answer)
     display_ground(answer)
+    display_ground(answer)
+    puts ""
     puts answer.blank_array.join(' ')
+    puts ""
     puts "Your incorrect guesses include: #{answer.wrong_guess.join(', ')}"
+    puts "==================================="
 
   end
 
 end
 
-# puts test.validate_letters
-
-# puts test.guess
-# puts test.compare_to_answer(Answer.new)
-# ap test.wrong_guess, color: {string: :cyanish}
 
 run_once = false
 if !run_once
@@ -125,13 +104,14 @@ def word_guess_method
     puts "Would you like to play again?"
     yes_or_no = gets.chomp.downcase
     if yes_or_no == "yes"
+      puts "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
       word_guess_method
     else
       puts "Thanks for playing."
     end
   end
   answer = Answer.new
-  puts answer.word
+  # puts answer.word
   gameboard = GameBoard.new
 
   until answer.lives_counter == 0 || answer.blank_array == answer.correct_array
@@ -140,16 +120,19 @@ def word_guess_method
     user_guess = UserGuess.new
     user_guess.validate_letters
     answer.compare_to_answer(user_guess)
+    puts "==================================="
     run_once = true
   end
 
   if answer.blank_array == answer.correct_array
-    puts "GREAT JOB! You guessed the right word!"
     gameboard.display_gameboard(answer)
+    puts "GREAT JOB! You guessed the right word!"
+    puts "==================================="
     play_again
   else
-    puts "BUMMER! Better luck next time!"
     gameboard.display_gameboard(answer)
+    puts "BUMMER! Better luck next time!"
+    puts "==================================="
     play_again
   end
 end
