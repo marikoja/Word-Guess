@@ -81,11 +81,9 @@ class GameBoard
   def display_gameboard(answer)
     lives_counter_display(answer)
     puts @main_image
-    print answer.blank_array
-    puts ""
-    puts answer.wrong_guess
-    puts ""
-    # print guess.wrong_guess
+    puts answer.blank_array.join(' ')
+    puts "Your incorrect guesses include: #{answer.wrong_guess.join(', ')}"
+
   end
 
   def display_main_image
