@@ -1,10 +1,9 @@
 require "awesome_print"
 class UserGuess
+  attr_reader :guess
   def initialize
     @guess = gets.chomp.downcase
   end
-
-  attr_accessor :guess, :correct_guess, :wrong_guess
 
   def validate_letters
     until @guess =~ (/[a-zA-Z]/) && @guess.length == 1
@@ -13,63 +12,78 @@ class UserGuess
     end
   end
 
-  def compare_to_answer(answer_word)
-    @correct_guess = []
-    @wrong_guess = []
-    if answer_word.word.include?(@guess)
-      @correct_guess << @guess
-    else
-      @wrong_guess << @guess
-    end
-  end
+  # def compare_to_answer(answer_word)
+  #   @correct_guess = []
+  #   @wrong_guess = []
+  #   if answer_word.word.include?(@guess)
+  #     @correct_guess << @guess
+  #   else
+  #     @wrong_guess << @guess
+  #   end
+  # end
 
 end
 
 class Answer
-  attr_accessor :word, :letters, :length
+  attr_reader :word, :letters, :length, :correct_guess, :wrong_guess, :lives_counter
   def initialize
     words = ["testing"]
     @word = words.sample
     @letters = @word.split(//).uniq
     @length = @word.length
+    @correct_guess = []
+    @wrong_guess = []
+    @lives_counter = 6
   end
 
   def correct_array
     @correct_array = Array.new(@word.length, "_")
   end
-end
 
-class GameBoard
-  attr_accessor :lives_counter
-  def initialize
-    @main_image = "some main image that doesn't change"
-    @lives_counter = 4
-  end
-
-  def losing_lives(guess)
-    @lives_counter = @lives_counter - (guess.wrong_guess).length
-  end
-
-  def lives_counter_display
-    @lives_counter.times do
-      print "some image"
+  def compare_to_answer(guess)
+    if @letters.include?(guess.guess)
+      @correct_guess << guess.guess
+    else
+      @wrong_guess << guess.guess
+      @lives_counter -= 1
     end
   end
 
-  def starting_display(answer)
-    lives_counter_display
-    puts @main_image
-    print answer.correct_array
-    puts ""
+end
+
+class GameBoard
+  attr_reader :lives_counter
+  def initialize
+    @main_image = display_main_image
+    # @lives_counter = 4
+    @flower_counter =" @ "
   end
 
-  def display_gameboard(answer, guess)
-    puts "some image counter"
+  # def losing_lives(answer)
+  #   @lives_counter  (answer.wrong_guess).length
+  # end
+
+  def lives_counter_display(answer)
+    answer.lives_counter.times do
+      print @flower_counter
+    end
+  end
+
+  def display_gameboard(answer)
+    lives_counter_display(answer)
     puts @main_image
     print answer.correct_array
     puts ""
-    print guess.wrong_guess
+    puts answer.wrong_guess
+    puts ""
+    # print guess.wrong_guess
   end
+
+  def display_main_image
+    return "\n |  |  |  | \n |  |  |  | \n============"
+  end
+
+
 end
 
 # puts test.validate_letters
@@ -80,20 +94,22 @@ end
 
 def word_guess_method
   answer = Answer.new
+  puts answer.letters
   gameboard = GameBoard.new
-  gameboard.starting_display(answer)
-  print "Please enter your single letter guess:"
+  gameboard.display_gameboard(answer)
+  print "Please enter your single letter guess: "
   user_guess = UserGuess.new
-  user_guess.compare_to_answer(answer)
-  gameboard.losing_lives(user_guess)
-  while gameboard.lives_counter > 0
-    gameboard.display_gameboard(answer, user_guess)
-    print "Please enter your single letter guess:"
+  user_guess.validate_letters
+  answer.compare_to_answer(user_guess)
+  # gameboard.losing_lives(answer)
+  while answer.lives_counter > 0
+    gameboard.display_gameboard(answer)
+    print "Please enter your single letter guess: "
     user_guess = UserGuess.new
-    user_guess.compare_to_answer(answer)
-    gameboard.losing_lives(user_guess)
+    answer.compare_to_answer(user_guess)
+    # gameboard.losing_lives(answer)
   end
+  puts "Bummer! you suck."
 end
-
 
 word_guess_method
