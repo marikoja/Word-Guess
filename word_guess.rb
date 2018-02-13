@@ -29,7 +29,7 @@ class Answer
   def initialize
     # words = ["testing"]
     # @word = words.sample
-    @word = RandomWord.nouns.next
+    @word = RandomWord.adjs.next
     @letters = @word.split(//).uniq
     @length = @word.length
     @correct_array = @word.split(//)
@@ -112,24 +112,46 @@ end
 # puts test.compare_to_answer(Answer.new)
 # ap test.wrong_guess, color: {string: :cyanish}
 
+run_once = false
+if !run_once
+  puts "Welcome to Word Guess!"
+  puts "Guess the word one letter at time but choose wisely."
+  puts "When your flowers are gone, you lose!"
+  puts "Guess them all and smell the virtual roses."
+end
+
 def word_guess_method
+  def play_again
+    puts "Would you like to play again?"
+    yes_or_no = gets.chomp.downcase
+    if yes_or_no == "yes"
+      word_guess_method
+    else
+      puts "Thanks for playing."
+    end
+  end
   answer = Answer.new
   puts answer.word
   gameboard = GameBoard.new
-  gameboard.display_gameboard(answer)
-  print "Please enter your single letter guess: "
-  user_guess = UserGuess.new
-  user_guess.validate_letters
-  answer.compare_to_answer(user_guess)
-  # gameboard.losing_lives(answer)
+
   until answer.lives_counter == 0 || answer.blank_array == answer.correct_array
     gameboard.display_gameboard(answer)
     print "Please enter your single letter guess: "
     user_guess = UserGuess.new
+    user_guess.validate_letters
     answer.compare_to_answer(user_guess)
-    # gameboard.losing_lives(answer)
+    run_once = true
   end
-  puts "Bummer! you suck."
+
+  if answer.blank_array == answer.correct_array
+    puts "GREAT JOB! You guessed the right word!"
+    gameboard.display_gameboard(answer)
+    play_again
+  else
+    puts "BUMMER! Better luck next time!"
+    gameboard.display_gameboard(answer)
+    play_again
+  end
 end
 
 word_guess_method
