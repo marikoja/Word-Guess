@@ -33,6 +33,25 @@ class Answer
     @letters = @word.split(//).uniq
     @length = @word.length
   end
+
+  def correct_array
+    @correct_array = Array.new(@word.length, "_")
+  end
+end
+
+class GameBoard
+  def initialize
+    @main_image = "some main image that doesn't change"
+    @lives_counter = 4
+  end
+
+  def display_gameboard(answer, guess)
+    puts "some image counter"
+    puts @main_image
+    print answer.correct_array
+    puts ""
+    print guess.wrong_guess
+  end
 end
 
 test = UserGuess.new
@@ -41,3 +60,5 @@ puts test.validate_letters
 puts test.guess
 puts test.compare_to_answer(Answer.new)
 ap test.wrong_guess, color: {string: :cyanish}
+gameboard = GameBoard.new
+gameboard.display_gameboard(Answer.new, test)
