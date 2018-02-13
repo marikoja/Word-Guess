@@ -25,27 +25,36 @@ class UserGuess
 end
 
 class Answer
-  attr_reader :word, :letters, :length, :correct_guess, :wrong_guess, :lives_counter
+  attr_reader :word, :letters, :length, :correct_array, :wrong_guess, :lives_counter, :blank_array
   def initialize
     words = ["testing"]
     @word = words.sample
     @letters = @word.split(//).uniq
     @length = @word.length
-    @correct_guess = []
+    @correct_array = @word.split(//)
+    @blank_array = Array.new(@length, "_")
+    # @correct_guess = []
     @wrong_guess = []
     @lives_counter = 6
   end
 
-  def correct_array
-    @correct_array = Array.new(@word.length, "_")
-  end
-
   def compare_to_answer(guess)
     if @letters.include?(guess.guess)
-      @correct_guess << guess.guess
+      # @correct_guess << guess.guess
+      update_blank_array(guess)
     else
       @wrong_guess << guess.guess
       @lives_counter -= 1
+    end
+  end
+
+  def update_blank_array(guess)
+    i = 0
+    @correct_array.each do |correct_letter|
+      if correct_letter.include?(guess.guess)
+        @blank_array[i] = correct_letter
+      end
+      i += 1
     end
   end
 
@@ -72,7 +81,7 @@ class GameBoard
   def display_gameboard(answer)
     lives_counter_display(answer)
     puts @main_image
-    print answer.correct_array
+    print answer.blank_array
     puts ""
     puts answer.wrong_guess
     puts ""
@@ -102,7 +111,7 @@ def word_guess_method
   user_guess.validate_letters
   answer.compare_to_answer(user_guess)
   # gameboard.losing_lives(answer)
-  while answer.lives_counter > 0
+  until answer.lives_counter == 0 || answer.blank_array == answer.correct_array
     gameboard.display_gameboard(answer)
     print "Please enter your single letter guess: "
     user_guess = UserGuess.new
