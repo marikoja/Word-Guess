@@ -1,4 +1,4 @@
-require "awesome_print"
+require "random-word"
 class UserGuess
   attr_reader :guess
   def initialize
@@ -27,15 +27,16 @@ end
 class Answer
   attr_reader :word, :letters, :length, :correct_array, :wrong_guess, :lives_counter, :blank_array
   def initialize
-    words = ["testing"]
-    @word = words.sample
+    # words = ["testing"]
+    # @word = words.sample
+    @word = RandomWord.nouns.next
     @letters = @word.split(//).uniq
     @length = @word.length
     @correct_array = @word.split(//)
-    @blank_array = Array.new(@length, "_")
+    @blank_array = Array.new(@length, "__")
     # @correct_guess = []
     @wrong_guess = []
-    @lives_counter = 6
+    @lives_counter = @length
   end
 
   def compare_to_answer(guess)
@@ -63,7 +64,7 @@ end
 class GameBoard
   attr_reader :lives_counter
   def initialize
-    @main_image = display_main_image
+    # @main_image = display_main_image
     # @lives_counter = 4
     @flower_counter =" @ "
   end
@@ -76,20 +77,32 @@ class GameBoard
     answer.lives_counter.times do
       print @flower_counter
     end
+    puts ""
+  end
+
+  def display_stems(answer)
+    answer.length.times do
+      print " | "
+    end
+    puts ""
+  end
+
+  def display_ground(answer)
+    answer.length.times do
+      print "==="
+    end
+    puts ""
   end
 
   def display_gameboard(answer)
     lives_counter_display(answer)
-    puts @main_image
+    display_stems(answer)
+    display_stems(answer)
+    display_ground(answer)
     puts answer.blank_array.join(' ')
     puts "Your incorrect guesses include: #{answer.wrong_guess.join(', ')}"
 
   end
-
-  def display_main_image
-    return "\n |  |  |  | \n |  |  |  | \n============"
-  end
-
 
 end
 
@@ -101,7 +114,7 @@ end
 
 def word_guess_method
   answer = Answer.new
-  puts answer.letters
+  puts answer.word
   gameboard = GameBoard.new
   gameboard.display_gameboard(answer)
   print "Please enter your single letter guess: "
