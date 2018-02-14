@@ -5,8 +5,8 @@ class UserGuess
     @guess = gets.chomp.downcase
   end
 
-  def validate_letters
-    until @guess =~ (/[a-zA-Z]/) && @guess.length == 1
+  def validate_letters (answer)
+    until (@guess =~ (/[a-zA-Z]/) && @guess.length == 1) || (@guess.length == answer.length)
       puts "Please enter a single letter of the alphabet"
       @guess = gets.chomp.downcase
     end
@@ -28,9 +28,13 @@ class Answer
   def compare_to_answer(guess)
     if @letters.include?(guess.guess)
       update_blank_array(guess)
-    else
+    elsif @word == guess.guess
+      @blank_array = @correct_array
+    elsif !@wrong_guess.include?(guess.guess)
       @wrong_guess << guess.guess
       @lives_counter -= 1
+    else
+      puts "You already guessed that. Try again."
     end
   end
 
@@ -111,14 +115,14 @@ def word_guess_method
     end
   end
   answer = Answer.new
-  # puts answer.word
+  # puts "#{answer.word} (118)"
   gameboard = GameBoard.new
 
-  until answer.lives_counter == 0 || answer.blank_array == answer.correct_array
+  until answer.lives_counter == 0 || answer.blank_array == answer.correct_array ||
     gameboard.display_gameboard(answer)
     print "Please enter your single letter guess: "
     user_guess = UserGuess.new
-    user_guess.validate_letters
+    user_guess.validate_letters(answer)
     answer.compare_to_answer(user_guess)
     puts "==================================="
     run_once = true
