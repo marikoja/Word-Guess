@@ -1,4 +1,7 @@
 require "random-word"
+require "colorize"
+
+
 class UserGuess
   attr_reader :guess
   def initialize
@@ -7,7 +10,7 @@ class UserGuess
 
   def validate_letters (answer)
     until (@guess =~ (/[a-zA-Z]/) && @guess.length == 1) || (@guess.length == answer.length)
-      puts "Please enter a single letter of the alphabet"
+      puts "Please enter a single letter of the alphabet or guess a better word"
       @guess = gets.chomp.downcase
     end
   end
@@ -16,7 +19,7 @@ end
 class Answer
   attr_reader :word, :letters, :length, :correct_array, :wrong_guess, :lives_counter, :blank_array
   def initialize
-    @word = RandomWord.adjs.next
+    @word = RandomWord.adjs(not_shorter_than: 4, not_longer_than: 10).next
     @letters = @word.split(//).uniq
     @length = @word.length
     @correct_array = @word.split(//)
@@ -53,37 +56,40 @@ end
 class GameBoard
   attr_reader :lives_counter
   def initialize
-    @flower_counter =" @ "
+    @flower_counter = " ^ "
   end
 
   def lives_counter_display(answer)
     answer.lives_counter.times do
-      print @flower_counter
+      print @flower_counter.light_yellow.blink
     end
     puts ""
   end
 
   def display_stems(answer)
+    stem = ""
     answer.length.times do
-      print " | "
+      stem << " | "
     end
-    puts ""
+    return stem
   end
 
   def display_ground(answer)
+    ground = ""
     answer.length.times do
-      print "\#\#\#"
+      ground << "\#\#\#"
     end
-    puts ""
+    return ground
   end
 
   def display_gameboard(answer)
     puts ""
     lives_counter_display(answer)
-    display_stems(answer)
-    display_stems(answer)
-    display_ground(answer)
-    display_ground(answer)
+    puts display_stems(answer).green
+    puts display_stems(answer).light_green
+    puts display_ground(answer).light_cyan
+    puts display_ground(answer).light_blue
+    puts display_ground(answer).light_cyan
     puts ""
     puts answer.blank_array.join(' ')
     puts ""
@@ -93,7 +99,6 @@ class GameBoard
   end
 
 end
-
 
 run_once = false
 if !run_once
@@ -115,7 +120,7 @@ def word_guess_method
     end
   end
   answer = Answer.new
-  # puts "#{answer.word} (118)"
+  puts "#{answer.word} #{answer.length}(118)"
   gameboard = GameBoard.new
 
   until answer.lives_counter == 0 || answer.blank_array == answer.correct_array ||
