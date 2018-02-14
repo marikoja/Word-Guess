@@ -1,7 +1,7 @@
 require "random-word"
 require "colorize"
 
-
+# user guess class will accept and validate user inputs
 class UserGuess
   attr_reader :guess
   def initialize
@@ -16,10 +16,11 @@ class UserGuess
   end
 end
 
+# answer class generates word and checks if user guess is correct
 class Answer
   attr_reader :word, :letters, :length, :correct_array, :wrong_guess, :lives_counter, :blank_array
   def initialize
-    @word = RandomWord.adjs(not_shorter_than: 4, not_longer_than: 10).next
+    @word = RandomWord.adjs(not_shorter_than: 4, not_longer_than: 8).next
     @letters = @word.split(//).uniq
     @length = @word.length
     @correct_array = @word.split(//)
@@ -28,6 +29,7 @@ class Answer
     @lives_counter = @length
   end
 
+# compares guess to answer and updates lives counter
   def compare_to_answer(guess)
     if @letters.include?(guess.guess)
       update_blank_array(guess)
@@ -41,6 +43,7 @@ class Answer
     end
   end
 
+# when correct guess is made blank array is updated for display
   def update_blank_array(guess)
     i = 0
     @correct_array.each do |correct_letter|
@@ -53,6 +56,7 @@ class Answer
 
 end
 
+# gameboard class contains and manages all visuals for game
 class GameBoard
   attr_reader :lives_counter
   def initialize
@@ -82,6 +86,7 @@ class GameBoard
     return ground
   end
 
+# brings together all gameboard pieces and adds color
   def display_gameboard(answer)
     puts ""
     lives_counter_display(answer)
@@ -93,24 +98,18 @@ class GameBoard
     puts ""
     puts answer.blank_array.join(' ')
     puts ""
-    puts "Your incorrect guesses include: #{answer.wrong_guess.join(', ')}"
     puts "==================================="
+    puts "Your incorrect letters: #{answer.wrong_guess.join(', ')}"
+    puts ""
 
   end
-
 end
 
-run_once = false
-if !run_once
-  puts "Welcome to Word Guess!"
-  puts "Guess the word one letter at time but choose wisely."
-  puts "When your flowers are gone, you lose!"
-  puts "Guess them all and smell the virtual roses."
-end
-
+# starts game and loops until game completion
 def word_guess_method
+# enables player to begin again
   def play_again
-    puts "Would you like to play again?"
+    puts "Type yes to play again or anything else to quit"
     yes_or_no = gets.chomp.downcase
     if yes_or_no == "yes"
       puts "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
@@ -119,10 +118,13 @@ def word_guess_method
       puts "Thanks for playing."
     end
   end
+# initializes new word and game board at game start
   answer = Answer.new
-  puts "#{answer.word} #{answer.length}(118)"
   gameboard = GameBoard.new
 
+# FOR TESTING puts "#{answer.word} #{answer.length}"
+
+# main loop reprints board and prompts for new input
   until answer.lives_counter == 0 || answer.blank_array == answer.correct_array ||
     gameboard.display_gameboard(answer)
     print "Please enter your single letter guess: "
@@ -130,20 +132,30 @@ def word_guess_method
     user_guess.validate_letters(answer)
     answer.compare_to_answer(user_guess)
     puts "==================================="
-    run_once = true
   end
 
+# runs on completion of game and prompts for starting over
   if answer.blank_array == answer.correct_array
     gameboard.display_gameboard(answer)
     puts "GREAT JOB! You guessed the right word!"
+    puts "Enjoy your cake!"
     puts "==================================="
     play_again
   else
     gameboard.display_gameboard(answer)
-    puts "BUMMER! Better luck next time!"
+    puts "BUMMER!!!"
+    puts "The answer was: #{answer.word}"
+    puts "Sorry, no cake for you!!"
     puts "==================================="
     play_again
   end
 end
 
+# Opening prompt will only run at game start
+puts ""
+puts "Welcome to Word Guess!"
+puts ""
+puts "Guess the word one letter at time but choose wisely."
+puts "When your candles have all gone out, the game will end."
+puts "Guess them all and you can have your cake and eat it too!"
 word_guess_method
